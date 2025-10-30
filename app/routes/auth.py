@@ -6,6 +6,7 @@ Handles user login, registration, logout, and dashboard
 from flask import Blueprint, render_template_string, request, redirect, url_for, session, flash
 from app.templates import LOGIN_HTML, REGISTER_HTML, DASHBOARD_HTML
 from app.data import users, admins, hash_password
+from app.csv_logger import log_user
 
 bp = Blueprint('auth', __name__)
 
@@ -65,6 +66,11 @@ def register():
                 'fullname': fullname,
                 'phone': phone
             }
+            # Mirror to CSV
+            try:
+                log_user(email, users[email])
+            except Exception:
+                pass
             flash('Registration successful! Please login.', 'success')
             return redirect(url_for('auth.login'))
     

@@ -480,34 +480,34 @@ BOOKING_HTML = """
             </div>
             {% endif %}
             
-            <form id="booking-form" method="POST" action="/process-booking">
+<form id="booking-form" method="POST" action="/process-booking">
                 <input type="hidden" name="train_id" value="{{ train_id }}">
                 <input type="hidden" name="date" value="{{ request.args.get('date', '2025-10-15') }}">
                 <h3 style="margin-bottom: 15px; color: #444;">Passenger Details</h3>
                 
                 <div id="passenger-container">
-                    <div class="passenger-form" id="passenger-1" data-fare="2500" style="border: 1px solid var(--light-grey); padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+                    <div class="passenger-form" data-index="1" style="border: 1px solid var(--light-grey); padding: 15px; border-radius: 4px; margin-bottom: 15px;">
                         <h4 style="margin-bottom: 10px; color: var(--primary-blue);">Passenger 1</h4>
                         <div style="display: flex; gap: 20px; flex-wrap: wrap;">
                             <div class="form-group" style="flex: 3; min-width: 200px;">
-                                <label for="passenger_name">Name</label>
-                                <input type="text" name="passenger_name" id="passenger_name" required>
+                                <label>Name</label>
+                                <input type="text" name="passenger_name[]" required>
                             </div>
                             <div class="form-group" style="flex: 1; min-width: 80px;">
-                                <label for="passenger_age">Age</label>
-                                <input type="number" name="passenger_age" id="passenger_age" required>
+                                <label>Age</label>
+                                <input type="number" name="passenger_age[]" required>
                             </div>
                             <div class="form-group" style="flex: 1; min-width: 100px;">
-                                <label for="passenger_gender">Gender</label>
-                                <select name="passenger_gender" id="passenger_gender">
+                                <label>Gender</label>
+                                <select name="passenger_gender[]">
                                     <option>Male</option>
                                     <option>Female</option>
                                     <option>Other</option>
                                 </select>
                             </div>
                             <div class="form-group" style="flex: 2; min-width: 200px;">
-                                <label for="seat_type">Seat Type</label>
-                                <select name="seat_type" id="seat_type" onchange="updateTotalFare()">
+                                <label>Seat Type</label>
+                                <select name="seat_type[]" onchange="updateTotalFare()">
                                     <option value="SL">Sleeper (SL) - ₹{{ train.fare.SL }}</option>
                                     <option value="3A">AC 3 Tier (3A) - ₹{{ train.fare['3A'] }}</option>
                                     <option value="2A">AC 2 Tier (2A) - ₹{{ train.fare['2A'] }}</option>
@@ -516,6 +516,8 @@ BOOKING_HTML = """
                         </div>
                     </div>
                 </div>
+
+                <button type="button" class="btn btn-add" onclick="addPassenger()">+ Add Passenger</button>
 
                 <div style="text-align: right; margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--light-grey);">
                     <h3 style="color: var(--danger-red); margin-bottom: 15px;">Total Ticket Fare: <span id="total-fare">₹{{ train.fare.SL }}</span></h3>
@@ -529,10 +531,52 @@ BOOKING_HTML = """
         const trainFares = {{ train.fare|tojson }};
         
         function updateTotalFare() {
-            const seatTypeSelect = document.getElementById('seat_type');
-            const selectedSeatType = seatTypeSelect.value;
-            const fare = trainFares[selectedSeatType];
-            document.getElementById('total-fare').textContent = `₹${fare}`;
+            const selects = document.querySelectorAll('select[name="seat_type[]"]');
+            let total = 0;
+            selects.forEach(sel => {
+                const fare = trainFares[sel.value] || 0;
+                total += fare;
+            });
+            document.getElementById('total-fare').textContent = `₹${total}`;
+        }
+
+        function addPassenger() {
+            const container = document.getElementById('passenger-container');
+            const index = container.children.length + 1;
+            const div = document.createElement('div');
+            div.className = 'passenger-form';
+            div.setAttribute('data-index', index);
+            div.style.cssText = 'border: 1px solid var(--light-grey); padding: 15px; border-radius: 4px; margin-bottom: 15px;';
+            div.innerHTML = `
+                <h4 style="margin-bottom: 10px; color: var(--primary-blue);">Passenger ${index}</h4>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <div class=\"form-group\" style=\"flex: 3; min-width: 200px;\">
+                        <label>Name</label>
+                        <input type=\"text\" name=\"passenger_name[]\" required>
+                    </div>
+                    <div class=\"form-group\" style=\"flex: 1; min-width: 80px;\">
+                        <label>Age</label>
+                        <input type=\"number\" name=\"passenger_age[]\" required>
+                    </div>
+                    <div class=\"form-group\" style=\"flex: 1; min-width: 100px;\">
+                        <label>Gender</label>
+                        <select name=\"passenger_gender[]\">
+                            <option>Male</option>
+                            <option>Female</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class=\"form-group\" style=\"flex: 2; min-width: 200px;\">
+                        <label>Seat Type</label>
+                        <select name=\"seat_type[]\" onchange=\"updateTotalFare()\">
+                            <option value=\"SL\">Sleeper (SL) - ₹${trainFares['SL']}</option>
+                            <option value=\"3A\">AC 3 Tier (3A) - ₹${trainFares['3A']}</option>
+                            <option value=\"2A\">AC 2 Tier (2A) - ₹${trainFares['2A']}</option>
+                        </select>
+                    </div>
+                </div>`;
+            container.appendChild(div);
+            updateTotalFare();
         }
 
         // Initialize on page load
@@ -687,8 +731,22 @@ CANCELLATION_HTML = """
                     <input type="text" id="pnr" name="pnr" placeholder="Enter your PNR number" required>
                 </div>
                 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Cancel Ticket</button>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" name="action" value="check" class="btn btn-secondary" style="flex: 1;">Check PNR Status</button>
+                    <button type="submit" name="action" value="cancel" class="btn btn-primary" style="flex: 1;">Cancel Ticket</button>
+                </div>
             </form>
+
+            {% if booking %}
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-top: 20px;">
+                <h3 style="color: var(--primary-blue); margin-bottom: 10px;">PNR Details</h3>
+                <p><strong>Status:</strong> {{ booking.status }}</p>
+                <p><strong>Train:</strong> {{ booking.train_id }}</p>
+                <p><strong>Journey Date:</strong> {{ booking.date }}</p>
+                <p><strong>Passengers:</strong> {{ booking.passengers|length }}</p>
+                <p><strong>Total Fare:</strong> ₹{{ booking.fare }}</p>
+            </div>
+            {% endif %}
 
             <div style="text-align: center; margin-top: 20px;">
                 <a href="/search" style="color: var(--primary-blue);">← Back to Booking</a>
@@ -859,34 +917,57 @@ ADMIN_DASHBOARD_HTML = """
 
 ADMIN_TRAINS_HTML = """
 <!DOCTYPE html>
-<html lang="en">
+<html lang=\"en\">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset=\"UTF-8\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
     <title>NextStop | Admin Trains</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel=\"stylesheet\" href=\"/styles.css\">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="container nav-content">
-            <a href="/" class="logo">
-                <img src="/static/logo.jpg" alt="NextStop Logo">
-                NextStop Admin
+    <nav class=\"navbar\">
+        <div class=\"container nav-content\">
+            <a href=\"/\" class=\"logo\">
+                <img src=\"/static/logo.jpg\" alt=\"NextStop Logo\">\n                NextStop Admin
             </a>
-            <ul class="nav-links">
-                <li><a href="/admin">Dashboard</a></li>
-                <li><a href="/admin/trains">Trains</a></li>
-                <li><a href="/admin/bookings">Bookings</a></li>
-                <li><a href="/logout">Logout</a></li>
+            <ul class=\"nav-links\">
+                <li><a href=\"/admin\">Dashboard</a></li>
+                <li><a href=\"/admin/trains\">Trains</a></li>
+                <li><a href=\"/admin/bookings\">Bookings</a></li>
+                <li><a href=\"/logout\">Logout</a></li>
             </ul>
         </div>
     </nav>
 
-    <main class="main-content">
-        <div class="container">
-            <h2 style="color: var(--primary-blue); margin-bottom: 20px;">🚂 Train Management</h2>
+    <main class=\"main-content\">
+        <div class=\"container\">
+            <h2 style=\"color: var(--primary-blue); margin-bottom: 20px;\">🚂 Train Management</h2>
+
+            <div class=\"form-card\" style=\"max-width: 100%;\">
+                <h3 style=\"margin-bottom: 10px;\">Add Train</h3>
+                <form method=\"POST\" action=\"/admin/add-train\" style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px;\">
+                    <input type=\"text\" name=\"train_id\" placeholder=\"Train ID (e.g., 12951)\" required>
+                    <input type=\"text\" name=\"name\" placeholder=\"Name\" required>
+                    <input type=\"text\" name=\"source\" placeholder=\"Source\" required>
+                    <input type=\"text\" name=\"destination\" placeholder=\"Destination\" required>
+                    <input type=\"text\" name=\"departure\" placeholder=\"Departure (HH:MM)\" required>
+                    <input type=\"text\" name=\"arrival\" placeholder=\"Arrival (HH:MM)\" required>
+                    <input type=\"number\" name=\"seats_total\" placeholder=\"Seats Total\" required>
+                    <input type=\"number\" name=\"fare_sl\" placeholder=\"Fare SL\" required>
+                    <input type=\"number\" name=\"fare_3a\" placeholder=\"Fare 3A\" required>
+                    <input type=\"number\" name=\"fare_2a\" placeholder=\"Fare 2A\" required>
+                    <select name=\"status\">
+                        <option value=\"Active\">Active</option>
+                        <option value=\"Inactive\">Inactive</option>
+                        <option value=\"Maintenance\">Maintenance</option>
+                    </select>
+                    <div style=\"grid-column: 1 / -1; text-align: right;\">
+                        <button type=\"submit\" class=\"btn btn-primary\">Add Train</button>
+                    </div>
+                </form>
+            </div>
             
-            <table class="data-table">
+            <table class=\"data-table\">
                 <thead>
                     <tr>
                         <th>Train ID</th>
@@ -909,22 +990,22 @@ ADMIN_TRAINS_HTML = """
                         <td>{{ train.arrival }}</td>
                         <td>{{ train.seats.available }}/{{ train.seats.total }}</td>
                         <td>
-                            <span style="
+                            <span style=\"
                                 {% if train.status == 'Active' %}color: var(--success-green);
                                 {% else %}color: var(--danger-red);{% endif %}
-                                font-weight: bold;">
+                                font-weight: bold;\">
                                 {{ train.status }}
                             </span>
                         </td>
                         <td>
-                            <form method="POST" action="/admin/update-train-status" style="display: inline;">
-                                <input type="hidden" name="train_id" value="{{ train_id }}">
-                                <select name="status" style="padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
-                                    <option value="Active" {% if train.status == 'Active' %}selected{% endif %}>Active</option>
-                                    <option value="Inactive" {% if train.status == 'Inactive' %}selected{% endif %}>Inactive</option>
-                                    <option value="Maintenance" {% if train.status == 'Maintenance' %}selected{% endif %}>Maintenance</option>
+                            <form method=\"POST\" action=\"/admin/update-train-status\" style=\"display: inline;\">
+                                <input type=\"hidden\" name=\"train_id\" value=\"{{ train_id }}\">
+                                <select name=\"status\" style=\"padding: 5px; border: 1px solid #ddd; border-radius: 4px;\">
+                                    <option value=\"Active\" {% if train.status == 'Active' %}selected{% endif %}>Active</option>
+                                    <option value=\"Inactive\" {% if train.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                                    <option value=\"Maintenance\" {% if train.status == 'Maintenance' %}selected{% endif %}>Maintenance</option>
                                 </select>
-                                <button type="submit" class="btn btn-sm btn-primary" style="margin-left: 5px;">Update</button>
+                                <button type=\"submit\" class=\"btn btn-sm btn-primary\" style=\"margin-left: 5px;\">Update</button>
                             </form>
                         </td>
                     </tr>
@@ -932,8 +1013,8 @@ ADMIN_TRAINS_HTML = """
                 </tbody>
             </table>
             
-            <div style="text-align: center; margin-top: 20px;">
-                <a href="/admin" class="btn btn-secondary">← Back to Dashboard</a>
+            <div style=\"text-align: center; margin-top: 20px;\">
+                <a href=\"/admin\" class=\"btn btn-secondary\">← Back to Dashboard</a>
             </div>
         </div>
     </main>
@@ -1115,40 +1196,40 @@ ADMIN_REPORTS_HTML = """
 
 ADMIN_WAITINGLIST_HTML = """
 <!DOCTYPE html>
-<html lang="en">
+<html lang=\"en\">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset=\"UTF-8\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
     <title>NextStop | Waiting List</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel=\"stylesheet\" href=\"/styles.css\">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="container nav-content">
-            <a href="/" class="logo">
-                <img src="/static/logo.jpg" alt="NextStop Logo">
-                NextStop Admin
+    <nav class=\"navbar\">
+        <div class=\"container nav-content\">
+            <a href=\"/\" class=\"logo\">
+                <img src=\"/static/logo.jpg\" alt=\"NextStop Logo\">\n                NextStop Admin
             </a>
-            <ul class="nav-links">
-                <li><a href="/admin">Dashboard</a></li>
-                <li><a href="/admin/bookings">Bookings</a></li>
-                <li><a href="/admin/reports">Reports</a></li>
-                <li><a href="/logout">Logout</a></li>
+            <ul class=\"nav-links\">
+                <li><a href=\"/admin\">Dashboard</a></li>
+                <li><a href=\"/admin/bookings\">Bookings</a></li>
+                <li><a href=\"/admin/reports\">Reports</a></li>
+                <li><a href=\"/logout\">Logout</a></li>
             </ul>
         </div>
     </nav>
 
-    <main class="main-content">
-        <div class="container">
-            <h2 style="color: var(--primary-blue); margin-bottom: 20px;">⏳ Waiting List Management</h2>
+    <main class=\"main-content\">
+        <div class=\"container\">
+            <h2 style=\"color: var(--primary-blue); margin-bottom: 20px;\">⏳ Waiting List Management</h2>
             
-            <table class="data-table">
+            <table class=\"data-table\">
                 <thead>
                     <tr>
                         <th>Train</th>
                         <th>PNR</th>
                         <th>Passenger Name</th>
                         <th>WL Position</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1158,19 +1239,25 @@ ADMIN_WAITINGLIST_HTML = """
                             <td>{{ wl.train_name }} ({{ wl.train_id }})</td>
                             <td>{{ wl.pnr }}</td>
                             <td>{{ wl.passenger_name }}</td>
-                            <td style="font-weight: bold; color: #856404;">WL-{{ wl.position }}</td>
+                            <td style=\"font-weight: bold; color: #856404;\">WL-{{ wl.position }}</td>
+                            <td>
+                                <form method=\"POST\" action=\"/admin/confirm-wl\">
+                                    <input type=\"hidden\" name=\"pnr\" value=\"{{ wl.pnr }}\">
+                                    <button type=\"submit\" class=\"btn btn-primary\">Confirm</button>
+                                </form>
+                            </td>
                         </tr>
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="4" style="text-align: center; padding: 30px;">No passengers in waiting list.</td>
+                            <td colspan=\"5\" style=\"text-align: center; padding: 30px;\">No passengers in waiting list.</td>
                         </tr>
                     {% endif %}
                 </tbody>
             </table>
             
-            <div style="text-align: center; margin-top: 20px;">
-                <a href="/admin" class="btn btn-secondary">← Back to Dashboard</a>
+            <div style=\"text-align: center; margin-top: 20px;\">
+                <a href=\"/admin\" class=\"btn btn-secondary\">← Back to Dashboard</a>
             </div>
         </div>
     </main>
