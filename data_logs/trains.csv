@@ -1,0 +1,8 @@
+timestamp,train_id,name,source,destination,departure,arrival,seats_total,seats_available,fare_SL,fare_3A,fare_2A,status
+2025-10-30T09:03:30,12951,Rajdhani Express,Mumbai,Delhi,17:00,09:00,200,150,2500,3500,4500,Active
+2025-10-30T09:03:30,12137,Punjab Mail,Mumbai,Delhi,19:30,21:30,180,20,1850,2850,3850,Active
+2025-10-30T09:03:30,22221,Duronto Express,Mumbai,Delhi,23:00,13:00,220,0,3100,4100,5100,Active
+2025-10-30T09:03:30,12001,Shatabdi Express,Delhi,Mumbai,06:00,22:30,150,75,2200,3200,4200,Active
+2025-10-30T09:03:30,12259,Duronto Express,Delhi,Mumbai,16:55,09:15,200,100,2800,3800,4800,Active
+2025-10-30T09:03:30,12627,Karnataka Express,Delhi,Bangalore,21:50,04:30,180,90,3200,4200,5200,Active
+2025-10-30T09:03:30,12024,Janshatabdi Express,Mumbai,Pune,07:15,10:30,120,60,450,750,950,Active

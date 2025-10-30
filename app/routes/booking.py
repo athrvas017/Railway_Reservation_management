@@ -9,6 +9,7 @@ from app.data import trains, bookings, waiting_lists
 from datetime import datetime
 import random
 import string
+from app.csv_logger import log_booking
 
 bp = Blueprint('booking', __name__)
 
@@ -107,7 +108,7 @@ def book(train_id):
 
 @bp.route('/process-booking', methods=['POST'])
 def process_booking_route():
-    """Process the booking form submission"""
+    """Process the booking form submission (supports multiple passengers)."""
     if 'user_email' not in session:
         return redirect(url_for('auth.login'))
     
@@ -115,19 +116,42 @@ def process_booking_route():
     date = request.form.get('date', datetime.now().strftime('%Y-%m-%d'))
     user_email = session['user_email']
     
-    # Simple passenger processing for demo
-    passengers = [{
-        'name': request.form.get('passenger_name', 'Demo Passenger'),
-        'age': request.form.get('passenger_age', '30'),
-        'gender': request.form.get('passenger_gender', 'Male'),
-        'seat_type': request.form.get('seat_type', 'SL')
-    }]
+    # Collect multiple passengers from form arrays
+    names = request.form.getlist('passenger_name[]') or [request.form.get('passenger_name', '')]
+    ages = request.form.getlist('passenger_age[]') or [request.form.get('passenger_age', '')]
+    genders = request.form.getlist('passenger_gender[]') or [request.form.get('passenger_gender', '')]
+    seat_types = request.form.getlist('seat_type[]') or [request.form.get('seat_type', 'SL')]
+
+    passengers = []
+    for i in range(len(names)):
+        name = names[i].strip() if i < len(names) else ''
+        age = (ages[i].strip() if i < len(ages) else '') or '0'
+        gender = genders[i].strip() if i < len(genders) else 'Other'
+        seat_type = seat_types[i].strip() if i < len(seat_types) else 'SL'
+        if name:
+            passengers.append({
+                'name': name,
+                'age': age,
+                'gender': gender,
+                'seat_type': seat_type
+            })
+
+    if not passengers:
+        flash('Please add at least one passenger', 'error')
+        return redirect(url_for('booking.book', train_id=train_id))
     
     # Calculate total fare
     train = trains[train_id]
-    total_fare = sum(train['fare'][p['seat_type']] for p in passengers)
+    total_fare = sum(train['fare'].get(p['seat_type'], 0) for p in passengers)
     
     pnr, status = process_booking(train_id, date, passengers, total_fare, user_email)
+
+    # Mirror booking to CSV
+    try:
+        booking_obj = bookings.get(pnr, {})
+        log_booking(pnr, booking_obj)
+    except Exception:
+        pass
     
     flash(f'Booking successful! PNR: {pnr}, Status: {status}', 'success')
     return redirect(url_for('booking.booking_details', pnr=pnr))
