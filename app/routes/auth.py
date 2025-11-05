@@ -14,10 +14,13 @@ bp = Blueprint('auth', __name__)
 def admin_login():
     """Admin login page"""
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        email = request.form.get('email') or request.form.get('username') or ''
+        email = email.strip().lower()
+        password = request.form.get('password', '')
         
-        if email in admins and admins[email]['password'] == hash_password(password):
+        if ' ' in password:
+            flash('Password cannot contain spaces', 'error')
+        elif email in admins and admins[email]['password'] == hash_password(password):
             session['user_email'] = email
             session['is_admin'] = True
             flash('Admin login successful!', 'success')
@@ -25,18 +28,20 @@ def admin_login():
         else:
             flash('Invalid admin credentials', 'error')
     
-    # Use modified login template for admin
-    admin_login_html = LOGIN_HTML.replace('User Login', 'Admin Login').replace('/login', '/admin-login').replace('Register here', 'User Login').replace('/register', '/login')
-    return render_template_string(admin_login_html)
+    # Use dedicated admin login template
+    from app.templates import ADMIN_LOGIN_HTML
+    return render_template_string(ADMIN_LOGIN_HTML)
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     """User login"""
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        email = (request.form.get('email') or '').strip().lower()
+        password = request.form.get('password', '')
         
-        if email not in users:
+        if ' ' in password:
+            flash('Password cannot contain spaces', 'error')
+        elif email not in users:
             flash('User not found', 'error')
         elif users[email]['password'] != hash_password(password):
             flash('Invalid password', 'error')
@@ -53,13 +58,19 @@ def login():
 def register():
     """User registration"""
     if request.method == 'POST':
-        fullname = request.form['fullname']
-        email = request.form['email']
-        phone = request.form['phone']
-        password = request.form['password']
+        fullname = (request.form.get('fullname') or '').strip()
+        email_raw = (request.form.get('email') or '').strip()
+        phone = (request.form.get('phone') or '').strip()
+        password = request.form.get('password', '')
         
-        if email in users:
+        email = email_raw.lower()
+        
+        if ' ' in password:
+            flash('Password cannot contain spaces', 'error')
+        elif not email or email in users:
             flash('Email already exists', 'error')
+        elif not (phone.isdigit() and len(phone) == 10):
+            flash('Phone must be exactly 10 digits', 'error')
         else:
             users[email] = {
                 'password': hash_password(password),

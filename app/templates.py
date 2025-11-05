@@ -7,55 +7,84 @@ INDEX_HTML = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Railway Reservation System | Home</title>
-    <link rel="stylesheet" href="/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NextStop | Modern Railway Reservation</title>
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-    <nav class="navbar">
-        <div class="container nav-content">
-            <a href="/" class="logo">
-                <img src="/static/logo.jpg" alt="NextStop Logo">
-                NextStop
-            </a>
-            <ul class="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/login">Login</a></li>
-                <li><a href="/register">Register</a></li>
-                <li><a href="/cancel-ticket">Cancel Ticket</a></li>
-            </ul>
-        </div>
-    </nav>
+  <nav class="navbar">
+    <div class="container nav-content">
+      <a href="/" class="logo">
+        <img src="/static/logo.jpg" alt="NextStop Logo" />
+        NextStop
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/register">Register</a></li>
+        <li><a href="/cancel-ticket">Cancel Ticket</a></li>
+      </ul>
+    </div>
+  </nav>
 
-    <main class="main-content">
-        <div class="container">
-            <header style="text-align: center; padding: 60px 0; background: var(--white); border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-                <h1 style="color: var(--primary-blue); margin-bottom: 10px;">Welcome to NextStop</h1>
-                <p style="font-size: 1.2em; color: var(--secondary-grey);">Your seamless platform for train ticket reservations.</p>
-                <div style="margin-top: 30px;">
-                    <a href="/login" class="btn btn-primary" style="padding: 15px 30px; font-size: 1.1em;">Start Booking Now</a>
-                </div>
-            </header>
-
-            <section style="margin-top: 40px; text-align: center;">
-                <h2 style="color: var(--primary-blue); margin-bottom: 20px;">Railway Reservation System</h2>
-                <p style="max-width: 800px; margin: 0 auto; color: #555;">
-                    This system provides comprehensive functionality for Railway Reservation Management.
-                    Book tickets, manage your journeys, and experience seamless travel planning.
-                    We have pre-loaded demo data so you can explore all features immediately!
-                </p>
-                
-                <div style="margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 8px; max-width: 600px; margin: 30px auto;">
-                    <h3 style="color: var(--primary-blue); margin-bottom: 15px;">🎯 Try Demo Accounts</h3>
-                    <p style="font-size: 0.9em; color: #666;">
-                        <strong>Users:</strong> john.doe@email.com / password123<br>
-                        <strong>Admin:</strong> admin@nextstop.com / admin123
-                    </p>
-                </div>
-            </section>
+  <main class="main-content">
+    <div class="container">
+      <!-- HERO -->
+      <section style="
+        background: radial-gradient(1200px 600px at 20% -10%, #e0f2fe 0%, transparent 60%),
+                    radial-gradient(1200px 600px at 120% 10%, #e9d5ff 0%, transparent 60%),
+                    var(--white);
+        border: 1px solid var(--light-grey);
+        border-radius: 16px;
+        padding: 56px 28px;
+        box-shadow: var(--shadow);
+        text-align: center;">
+        <h1 style="font-size: 2.4rem; line-height: 1.2; color: var(--primary-blue); margin-bottom: 10px;">
+          Plan, Book, and Travel Smarter
+        </h1>
+        <p style="max-width: 760px; margin: 0 auto; color: var(--secondary-grey); font-size: 1.05rem;">
+          A modern platform for seamless railway reservations with live seat availability,
+          smart waitlist handling, and instant confirmations.
+        </p>
+        <div style="margin-top: 26px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <a href="/login" class="btn btn-primary">Start Booking</a>
+          <a href="/register" class="btn btn-secondary">Create Account</a>
         </div>
-    </main>
+      </section>
+
+      <!-- FEATURES -->
+      <section style="margin-top: 36px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px;">
+        <div class="form-card" style="padding: 24px;">
+          <h3 style="margin-bottom: 6px; color: #0f172a;">Fast Search</h3>
+          <p style="color: var(--secondary-grey);">Search trains by route with real-time seat status.</p>
+        </div>
+        <div class="form-card" style="padding: 24px;">
+          <h3 style="margin-bottom: 6px; color: #0f172a;">Multi-passenger</h3>
+          <p style="color: var(--secondary-grey);">Add multiple passengers and auto-calc fare.</p>
+        </div>
+        <div class="form-card" style="padding: 24px;">
+          <h3 style="margin-bottom: 6px; color: #0f172a;">Smart Waitlist</h3>
+          <p style="color: var(--secondary-grey);">Transparent WL positions and easy admin confirm.</p>
+        </div>
+        <div class="form-card" style="padding: 24px;">
+          <h3 style="margin-bottom: 6px; color: #0f172a;">Secure</h3>
+          <p style="color: var(--secondary-grey);">Hashed passwords and safe session handling.</p>
+        </div>
+      </section>
+
+      <!-- DEMO ACCOUNTS -->
+      <section style="margin-top: 36px; text-align: center;">
+        <div style="display: inline-block; padding: 18px 22px; border: 1px dashed var(--light-grey); border-radius: 12px; background: #f8fafc;">
+          <div style="font-weight: 700; color: var(--primary-blue); margin-bottom: 6px;">Try Demo Accounts</div>
+          <div style="color: var(--secondary-grey); font-size: 0.95rem;">
+            User: john.doe@email.com / password123
+            &nbsp;•&nbsp; Admin: admin@nextstop.com / admin123
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
 </body>
 </html>
 """
@@ -103,7 +132,7 @@ LOGIN_HTML = """
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="********" required>
+<input type="password" id="password" name="password" placeholder="********" required pattern="\S+" title="No spaces allowed" oninput="this.value=this.value.replace(/\s/g,'')">
             </div>
             <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">Login</button>
             <p style="text-align: center; margin-top: 15px; font-size: 0.9em;">
@@ -172,11 +201,11 @@ REGISTER_HTML = """
             </div>
             <div class="form-group">
                 <label for="phone">Phone Number</label>
-                <input type="text" id="phone" name="phone" placeholder="9876543210" required>
+<input type="tel" id="phone" name="phone" placeholder="9876543210" required pattern="\d{10}" minlength="10" maxlength="10" title="Enter 10 digits" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="********" required>
+<input type="password" id="password" name="password" placeholder="********" required pattern="\S+" title="No spaces allowed" oninput="this.value=this.value.replace(/\s/g,'')">
             </div>
             <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
             <p style="text-align: center; margin-top: 15px; font-size: 0.9em;">
@@ -667,6 +696,7 @@ BOOKING_DETAILS_HTML = """
                 <div style="text-align: center; margin-top: 30px;">
                     <a href="/search" class="btn btn-primary" style="margin-right: 10px;">Book Another Ticket</a>
                     <a href="/cancel-ticket" class="btn btn-secondary">Cancel This Ticket</a>
+                    <button onclick="window.print()" class="btn btn-secondary" style="margin-left: 10px;">🖨️ Print Ticket</button>
                 </div>
             </div>
         </div>
@@ -803,11 +833,11 @@ ADMIN_LOGIN_HTML = """
             <form method="POST" action="/admin-login">
                 <div class="form-group">
                     <label for="username">Admin Email</label>
-                    <input type="email" id="username" name="username" placeholder="admin@nextstop.com" required>
+<input type=\"email\" id=\"email\" name=\"email\" placeholder=\"admin@nextstop.com\" required>
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="********" required>
+<input type=\"password\" id=\"password\" name=\"password\" placeholder=\"********\" required pattern=\"\\S+\" title=\"No spaces allowed\" oninput=\"this.value=this.value.replace(/\\s/g,'')\">
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Login as Admin</button>
             </form>
@@ -943,7 +973,7 @@ ADMIN_TRAINS_HTML = """
         <div class=\"container\">
             <h2 style=\"color: var(--primary-blue); margin-bottom: 20px;\">🚂 Train Management</h2>
 
-            <div class=\"form-card\" style=\"max-width: 100%;\">
+            <div class=\"form-card\" style=\"max-width: 100%;\" id=\"add-train\">
                 <h3 style=\"margin-bottom: 10px;\">Add Train</h3>
                 <form method=\"POST\" action=\"/admin/add-train\" style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px;\">
                     <input type=\"text\" name=\"train_id\" placeholder=\"Train ID (e.g., 12951)\" required>
@@ -967,6 +997,9 @@ ADMIN_TRAINS_HTML = """
                 </form>
             </div>
             
+            <div style=\"text-align: right; margin: 10px 0;\">
+                <a href=\"#add-train\" class=\"btn btn-primary\">+ Add Train</a>
+            </div>
             <table class=\"data-table\">
                 <thead>
                     <tr>

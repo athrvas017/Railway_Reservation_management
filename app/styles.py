@@ -4,28 +4,30 @@ Contains all CSS styling for the application
 """
 
 CSS_STYLES = """
-/* General Reset and Base Styles */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
+/* Modern Reset */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    line-height: 1.6;
-    background-color: #f4f7f6;
-    color: #333;
+  margin: 0;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+  color: #0f172a; /* slate-900 */
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
-/* Color Palette */
+/* Color System */
 :root {
-    --primary-blue: #004d99;
-    --secondary-grey: #6c757d;
-    --white: #ffffff;
-    --light-grey: #e9ecef;
-    --success-green: #28a745;
-    --danger-red: #dc3545;
+  --primary-blue: #0f62fe; /* IBM blue */
+  --primary-blue-dark: #0043ce;
+  --secondary-grey: #64748b; /* slate-500 */
+  --white: #ffffff;
+  --light-grey: #e2e8f0; /* slate-200 */
+  --muted: #94a3b8; /* slate-400 */
+  --success-green: #16a34a; /* green-600 */
+  --danger-red: #dc2626; /* red-600 */
+  --warning-amber: #f59e0b; /* amber-500 */
+  --card-bg: #ffffffcc;
+  --shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
 }
 
 /* Utility Classes */
@@ -37,9 +39,12 @@ body {
 
 /* Navigation Bar */
 .navbar {
-    background-color: var(--primary-blue);
-    padding: 15px 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(90deg, var(--primary-blue-dark), var(--primary-blue));
+  padding: 14px 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
 }
 
 .nav-content {
@@ -49,13 +54,14 @@ body {
 }
 
 .logo {
-    color: var(--white);
-    font-size: 1.5em;
-    font-weight: bold;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  color: var(--white);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: .3px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .logo img {
@@ -87,18 +93,20 @@ body {
 
 /* Main Content */
 .main-content {
-    padding: 40px 0;
-    min-height: calc(100vh - 80px);
+  padding: 48px 0;
+  min-height: calc(100vh - 80px);
 }
 
 /* Forms */
 .form-card {
-    background-color: var(--white);
-    padding: 40px;
-    max-width: 500px;
-    margin: 40px auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: var(--card-bg);
+  backdrop-filter: saturate(180%) blur(6px);
+  padding: 36px;
+  max-width: 760px;
+  margin: 32px auto;
+  border-radius: 14px;
+  border: 1px solid var(--light-grey);
+  box-shadow: var(--shadow);
 }
 
 .form-group {
@@ -147,12 +155,13 @@ body {
 }
 
 .btn-primary {
-    background-color: var(--primary-blue);
-    color: var(--white);
+  background: linear-gradient(180deg, var(--primary-blue), var(--primary-blue-dark));
+  color: var(--white);
 }
 
 .btn-primary:hover {
-    background-color: #003366;
+  filter: brightness(1.05);
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
@@ -190,13 +199,13 @@ body {
 
 /* Tables */
 .data-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background-color: var(--white);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    border-radius: 6px;
-    overflow: hidden;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: var(--white);
+  box-shadow: var(--shadow);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .data-table th, .data-table td {
@@ -206,11 +215,12 @@ body {
 }
 
 .data-table th {
-    background-color: var(--primary-blue);
-    color: var(--white);
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 0.9em;
+  background: linear-gradient(90deg, var(--primary-blue-dark), var(--primary-blue));
+  color: var(--white);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85em;
+  letter-spacing: .4px;
 }
 
 .data-table tr:hover {
@@ -266,13 +276,13 @@ body {
 
 /* Messages */
 .message {
-    padding: 15px;
-    border-radius: 4px;
-    margin: 20px auto;
-    font-weight: 600;
-    text-align: center;
-    max-width: 600px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 14px 16px;
+  border-radius: 10px;
+  margin: 18px auto;
+  font-weight: 600;
+  text-align: center;
+  max-width: 720px;
+  box-shadow: var(--shadow);
 }
 
 .message-success {
