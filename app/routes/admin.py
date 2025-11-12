@@ -191,7 +191,7 @@ def reports():
     # Calculate report statistics
     total_bookings = len(bookings)
     confirmed_bookings = len([b for b in bookings.values() if b['status'] == 'CONFIRMED'])
-    canceled_bookings = len([b for b in bookings.values() if b['status'] == 'CANCELLED'])
+    canceled_bookings = len([b for b in bookings.values() if b['status'] in ('CANCELLED', 'CANCELED')])
     waiting_bookings = len([b for b in bookings.values() if b['status'].startswith('WL')])
     total_revenue = sum(b['fare'] for b in bookings.values() if b['status'] == 'CONFIRMED')
     
@@ -214,11 +214,14 @@ def waiting_list_view():
         return redirect(url_for('auth.login'))
 
     wl_rows = []
+    first_demo_pnr = None
     for train_id, pnr_list in waiting_lists.items():
         for idx, pnr in enumerate(pnr_list, start=1):
             b = bookings.get(pnr)
             if not b:
                 continue
+            if first_demo_pnr is None:
+                first_demo_pnr = pnr
             train_name = trains.get(train_id, {}).get('name', 'Unknown')
             passenger_name = b.get('passengers', [{}])[0].get('name', 'NA')
             wl_rows.append({
@@ -229,7 +232,7 @@ def waiting_list_view():
                 'position': idx,
             })
 
-    return render_template_string(ADMIN_WAITINGLIST_HTML, waiting_list=wl_rows)
+    return render_template_string(ADMIN_WAITINGLIST_HTML, waiting_list=wl_rows, demo_pnr=first_demo_pnr)
 
 
 @bp.route('/admin/confirm-wl', methods=['POST'])

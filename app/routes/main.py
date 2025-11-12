@@ -80,7 +80,7 @@ def cancel_ticket():
                 except Exception:
                     pass
 
-                booking['status'] = 'CANCELED'
+                booking['status'] = 'CANCELLED'
                 
                 flash(f'Ticket canceled successfully! PNR: {pnr}. Refund: ₹{refund_amount}', 'success')
                 booking_info = booking

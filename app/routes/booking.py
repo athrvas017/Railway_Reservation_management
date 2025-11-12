@@ -79,9 +79,14 @@ def search():
         return redirect(url_for('auth.login'))
     
     if request.method == 'POST':
-        source = request.form['source']
-        destination = request.form['destination']
+        source = (request.form['source']).strip()
+        destination = (request.form['destination']).strip()
         date = request.form['date']
+
+        # Prevent same source and destination
+        if source.lower() == destination.lower():
+            flash('Source and destination cannot be the same', 'error')
+            return render_template_string(SEARCH_HTML)
         
         trains_list = search_trains(source, destination, date)
         
@@ -125,16 +130,26 @@ def process_booking_route():
     passengers = []
     for i in range(len(names)):
         name = names[i].strip() if i < len(names) else ''
-        age = (ages[i].strip() if i < len(ages) else '') or '0'
-        gender = genders[i].strip() if i < len(genders) else 'Other'
-        seat_type = seat_types[i].strip() if i < len(seat_types) else 'SL'
-        if name:
-            passengers.append({
-                'name': name,
-                'age': age,
-                'gender': gender,
-                'seat_type': seat_type
-            })
+        age_raw = (ages[i].strip() if i < len(ages) else '')
+        gender = (genders[i].strip() if i < len(genders) else 'Other') or 'Other'
+        seat_type = (seat_types[i].strip() if i < len(seat_types) else 'SL') or 'SL'
+        if not name:
+            continue
+        # Age validation
+        try:
+            age_i = int(age_raw)
+        except (TypeError, ValueError):
+            flash('Passenger age must be a number', 'error')
+            return redirect(url_for('booking.book', train_id=train_id))
+        if age_i <= 0 or age_i > 120:
+            flash('Passenger age must be between 1 and 120', 'error')
+            return redirect(url_for('booking.book', train_id=train_id))
+        passengers.append({
+            'name': name,
+            'age': str(age_i),
+            'gender': gender,
+            'seat_type': seat_type
+        })
 
     if not passengers:
         flash('Please add at least one passenger', 'error')
