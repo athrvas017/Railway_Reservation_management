@@ -341,7 +341,7 @@ SEARCH_HTML = """
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        <form method="POST" action="/search">
+        <form method="POST" action="/search" onsubmit="return validateSearch()">
             <div class="form-group">
                 <label for="source">Source Station</label>
                 <input type="text" id="source" name="source" placeholder="E.g., Mumbai" required>
@@ -364,14 +364,28 @@ SEARCH_HTML = """
     </div>
 </main>
 <script>
+function validateSearch(){
+    const s = document.getElementById('source').value.trim().toLowerCase();
+    const d = document.getElementById('destination').value.trim().toLowerCase();
+    if(s && d && s === d){
+        alert('Source and destination cannot be the same');
+        return false;
+    }
+    return true;
+}
 // Set default date to tomorrow
 document.addEventListener('DOMContentLoaded', function() {
     const dateInput = document.getElementById('date');
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     dateInput.value = tomorrow.toISOString().split('T')[0];
+
+    // 🔹 Prevent past date selection
+    const today = new Date();
+    dateInput.min = today.toISOString().split('T')[0];
 });
 </script>
+
 </body>
 </html>
 """
@@ -524,7 +538,7 @@ BOOKING_HTML = """
                             </div>
                             <div class="form-group" style="flex: 1; min-width: 80px;">
                                 <label>Age</label>
-                                <input type="number" name="passenger_age[]" required>
+                                <input type="number" name="passenger_age[]" required min="1" max="120">
                             </div>
                             <div class="form-group" style="flex: 1; min-width: 100px;">
                                 <label>Gender</label>
@@ -1266,6 +1280,16 @@ ADMIN_WAITINGLIST_HTML = """
                     </tr>
                 </thead>
                 <tbody>
+            <div style=\"background: #f8fafc; border: 1px dashed var(--light-grey); padding: 14px; border-radius: 10px; margin-bottom: 14px;\">
+                <strong>Example:</strong> Select a row and click Confirm to promote a WL PNR to Confirmed status.
+                {% if demo_pnr %}
+                <form method=\"POST\" action=\"/admin/confirm-wl\" style=\"display:inline; margin-left: 8px;\">
+                    <input type=\"hidden\" name=\"pnr\" value=\"{{ demo_pnr }}\">
+                    <button type=\"submit\" class=\"btn btn-primary\">Confirm first WL ({{ demo_pnr }})</button>
+                </form>
+                {% endif %}
+            </div>
+
                     {% if waiting_list %}
                         {% for wl in waiting_list %}
                         <tr>
